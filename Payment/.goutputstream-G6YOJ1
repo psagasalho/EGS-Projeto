@@ -1,0 +1,115 @@
+openapi: 3.0.1
+info:
+  title: 'Payment API'
+  description: ''
+  version: 1.0.0
+paths:
+  /payment:
+    post:
+      description: 'Select payment method.'
+      requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentRequest"
+      responses:
+        "200":
+          description: '200 OK'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+
+  /payment/{subscription_id}:
+    put:
+      description: 'Subscriber confirms payment.'
+      requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmPaymentRequest"
+      parameters:
+        - in: path
+          name: subscription_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: '200 OK'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmPaymentResponse"
+
+
+    get:
+      description: 'Determine whether the payment was successfully paid or not.'
+      parameters:
+        - in: path
+          name: subscription_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: '200 OK'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentStatus"
+components:
+  schemas:
+   
+    PaymentRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          enum: [ debit, refund, subscription, preauth, capture ]
+        subscription_id:
+            type: integer
+  
+    PaymentResponse:
+      type: object
+      properties: 
+        method:
+          type: string
+          enum: [ debit, refund, subscription, preauth, capture ]
+        subscription_id:
+            type: integer
+            
+    ConfirmPaymentRequest:
+      type: object
+      properties:
+        state:
+          type: string
+          enum: [pending, succeeded, failed, expired, rejected]
+          
+    ConfirmPaymentResponse:
+      type: object
+      properties:
+        state:
+          type: string
+          enum: [pending, succeeded, failed, expired, rejected]
+
+    PaymentStatus:
+      type: object
+      properties: 
+        subscription_id:
+          type: integer
+        price:
+          type: integer
+        method: 
+          type: string
+          enum: [ debit, refund, subscription, preauth, capture ]
+        info:
+          type: string
+        payer:
+          type: string
+        state:
+          type: string
+          enum: [pending, succeeded, failed, expired, rejected]
+        
