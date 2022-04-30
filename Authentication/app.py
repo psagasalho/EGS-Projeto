@@ -18,10 +18,10 @@ from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
-FlaskUUID(app) # vamos usar o uuid para criar um token
-db= SQLAlchemy(app) # cria a base de dados
-bcrypt = Bcrypt (app) # para as passwords
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db' # coneta a app à base de dados
+FlaskUUID(app) # use uuid to create a token
+db= SQLAlchemy(app) # creates the database
+bcrypt = Bcrypt (app) # used in passwords
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db' # connects the app to the database
 app.config['SECRET_KEY'] = 'thisisasercretkey'
 
 login_manager = LoginManager()
@@ -33,28 +33,47 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-#tabela da base de dados
+#database table
+# id, username, nMec, email, hash da password, token
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique = True) 
-    # 20 caracteres no maximo -> unique = cada pessoa so pode ter um username e um token
-    password = db.Column(db.String(80), nullable=False) # 80 caracteres no maximo
+    nMec = db.Column(db.Integer, nullable=False, unique = True)
+    email = db.Column(db.String(30), nullable=False, unique = True)
+    password = db.Column(db.String(80), nullable=False)
     token = db.Column(db.String(80), nullable=False, unique = True) 
-
+   
 class RegisterFrom(FlaskForm):
     username = StringField(validators=[InputRequired(),Length(
         min=4, max=20)], render_kw={"placeholder" : "Username"})
+    nMec = StringField(validators=[InputRequired(),Length(
+        min=1, max=20)], render_kw={"placeholder" : "nMec"})
+    email = StringField(validators=[InputRequired(),Length(
+        min=4, max=20)], render_kw={"placeholder" : "email"})
     password = PasswordField(validators=[InputRequired(),Length(
         min=4, max=20)], render_kw={"placeholder" : "Password"})
-   # nMex_number = StringField(validators=[InputRequired(),Length(
-   #     min=4, max=20)], render_kw={"placeholder" : "NMec"})  
+    confirmPassword = PasswordField(validators=[InputRequired(),Length(
+        min=4, max=20)], render_kw={"placeholder" : "confirm password"})
     submit = SubmitField("Register")
-    # juntar o username na db e ver se existe
+   
+    # check if the created username already exists, if it does, choose another
     def validate_username(self,username):
-        existing_user_username = User.query.filter_by(
-            username=username.data).first()
+        existing_user_username = User.query.filter_by(username=username.data).first()
         if existing_user_username:
-            raise ValidationError("That username already exists.Please choose a different one.")
+            raise ValidationError("That username already exists. Please choose a different one.")
+
+    # check if the created email already exists, if it does, choose another 
+    def validate_email(self,email):
+        existing_user_email=  User.query.filter_by(email=email.data).first()
+        if existing_user_email:
+            raise ValidationError("That email already exists. Please choose a different one.")
+    
+    # check if the created nMec already exists, if it does, choose another
+    def validate_nMec(self,nMec):
+        existing_user_nMec=  User.query.filter_by(nMec=nMec.data).first()
+        if existing_user_nMec:
+            raise ValidationError("That nMec already exists. Please choose a different one.")
+    
 
 class LoginFrom(FlaskForm):
     username = StringField(validators=[InputRequired(),Length(
@@ -72,15 +91,15 @@ def login():
     form = LoginFrom()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user: # se estiver registado, verifica a password e entra
-            if user.password == form.password.data:
-            #if bcrypt.check_password_hash(user.password, form.password.data):
+        if user: # if you are registered, check your password and enter
+            passCheck = str(str(form.password.data) + str("ThisIsSecret"))
+            if bcrypt.check_password_hash(user.password, passCheck):
                 login_user(user)
-                return redirect(url_for('dashboard')) # se a pessoa se poder autenticar- gerar o token e usa lo como argumento na funcao de retornar o token
+                return redirect(url_for('dashboard')) 
     return render_template ('login.html', form = form)
 
 
-@app.route('/dashboard', methods = ['GET', 'POST']) #para ver se o login funcionou
+@app.route('/dashboard', methods = ['GET', 'POST']) #see if the login worked
 @login_required
 def dashboard():
     return render_template ('dashboard.html')
@@ -94,27 +113,47 @@ def logout():
 @app.route('/user' ,methods = ['GET', 'POST'])
 def register():
     form = RegisterFrom()
-    if form.validate_on_submit():
-        #hashed_password = bcrypt.generate_password_hash(form.password.data)
-        random_uuid = str(uuid.uuid4()) #uuid para gerar o token
-        new_user = User(username = form.username.data, password=form.password.data, token=random_uuid)
+    # it only registers if it is valid
+    if form.validate_on_submit() and form.password.data == form.confirmPassword.data:
+        string_password = str(str(form.password.data) + str("ThisIsSecret"))
+        hashed_password = bcrypt.generate_password_hash(string_password) 
+        random_uuid = str(uuid.uuid4()) #uuid to generate the token
+        token_username = User.query.filter_by(token=random_uuid).first() 
+        #as long as there is a username associated with the token = that token already exists
+        while token_username: 
+            random_uuid = str(uuid.uuid4()) #uuid to generate the token until no other exists
+        new_user = User(username = form.username.data, nMec = form.nMec.data, email= form.email.data, password=hashed_password, token=random_uuid)
         db.session.add(new_user)
         db.session.commit()
         return redirect (url_for('login'))
     return render_template ('register.html', form = form)
 
-#dao me o token e eu digo se e valido ou nao e retorno o username
+#see if the token is valid or not returning the username
 @app.route('/user/token/<token>',methods = ['GET', 'POST'])
-def token(token): #token em vez de username
-    token_username = User.query.filter_by(token=token).first() #ve se existe um user associado ao token
-    #token_user = token_aux.token # -> devolve o token
-    #print(token_username)
-    if token_username: # se existir um user associado ao token -> token valido
-        username_aux = token_username.username
+def token(token):
+    token_username = User.query.filter_by(token=token).first() 
+    if token_username: #if there is a user associated with the token -> token valid
+        #username_aux = token_username.username
         #print(username_aux)
-        return jsonify(token = "valido", username = token_username.username), 200
+        return jsonify(token = "valid", username = token_username.username), 200
+    return jsonify(token = "invalid"), 500
+
+"""
+#return the email giving me the token
+@app.route('/user/email/<token>',methods = ['GET', 'POST'])
+def email(token):
+    token_username = User.query.filter_by(token=token).first()
+    if token_username:#if there is a user associated with the token -> token valid -> exists email
+        return jsonify(token = "valido", email = token_username.email), 200
     return jsonify(token = "invalido"), 500
 
-
+#return the nMec giving me the token
+@app.route('/user/nMec/<token>',methods = ['GET', 'POST'])
+def nMec(token):
+    token_username = User.query.filter_by(token=token).first()
+    if token_username: #if there is a user associated with the token -> token valid ->  exists nMec
+        return jsonify(token = "valido", nMec = token_username.nMec), 200
+    return jsonify(token = "invalido"), 500
+"""
 if __name__=="__main__":
     app.run(debug=True)

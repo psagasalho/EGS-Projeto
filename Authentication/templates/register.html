@@ -11,7 +11,10 @@
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         {{ form.username }}
+        {{ form.nMec }}
+        {{ form.email }}
         {{ form.password }}
+        {{ form.confirmPassword}}
         {{ form.submit }}
     </form>
     <a href="{{url_for('login')}}">Log In</a><br>
