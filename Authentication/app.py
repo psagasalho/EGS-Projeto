@@ -135,7 +135,7 @@ def register():
     #return render_template ('register.html', form = form)
 
 #see if the token is valid or not returning the username
-@app.route('/user/token/<token>',methods = ['GET', 'POST'])
+@app.route('/user/<token>',methods = ['GET', 'POST'])
 def token(token):
     token_username = User.query.filter_by(token=token).first() 
     if token_username: #if there is a user associated with the token -> token valid
