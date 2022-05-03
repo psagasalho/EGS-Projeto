@@ -95,9 +95,12 @@ def login():
             passCheck = str(str(form.password.data) + str("ThisIsSecret"))
             if bcrypt.check_password_hash(user.password, passCheck):
                 login_user(user)
-                return redirect(url_for('dashboard')) 
-    return render_template ('login.html', form = form)
-
+                #return redirect(url_for('dashboard'))
+                return jsonify("Successful Operation"), 200
+    #return render_template ('login.html', form = form)
+    return jsonify("User not exists"), 400
+                 
+    
 
 @app.route('/dashboard', methods = ['GET', 'POST']) #see if the login worked
 @login_required
@@ -108,7 +111,8 @@ def dashboard():
 @login_required
 def logout():
     logout_user
-    return redirect(url_for('login'))
+    return jsonify("Successful Operation"), 200 
+    #return redirect(url_for('login'))
 
 @app.route('/user' ,methods = ['GET', 'POST'])
 def register():
@@ -125,8 +129,10 @@ def register():
         new_user = User(username = form.username.data, nMec = form.nMec.data, email= form.email.data, password=hashed_password, token=random_uuid)
         db.session.add(new_user)
         db.session.commit()
-        return redirect (url_for('login'))
-    return render_template ('register.html', form = form)
+        #return redirect (url_for('login'))
+        return jsonify("Created User"), 201
+    return jsonify("User not Created - Some field not filled in correctly"), 400
+    #return render_template ('register.html', form = form)
 
 #see if the token is valid or not returning the username
 @app.route('/user/token/<token>',methods = ['GET', 'POST'])
