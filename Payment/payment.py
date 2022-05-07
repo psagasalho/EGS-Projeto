@@ -15,99 +15,77 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= TRUE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
-#method table
-class methodsList(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    method = db.Column(db.String(80), nullable=False)
-
 #database table - transactions
 class transaction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    transaction_id = db.Column(db.String(120), primary_key=True)
+    order_id = db.Column(db.Integer, nullable=False)
+    method_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.String(80), nullable=False)
     amount = db.Column(db.String(80),nullable=False)
     successful = db.Column(db.String(80),nullable=False)
 
-class Wallet:
-    user = ""
-    amount = 0
-    def __init__(self, username,amount):
-        self.user = username
-        self.amount = amount
-    
-    def registerWallet(self):
-        return {}
+#selects payment method and get payment information
+@app.route('/payment/<int:order_id>', methods=["GET", "POST"] )
+def method(order_id):
+    if 'method' not in request.values:
+        return jsonify("Bad Request"),400
+    if 'price' not in request.values:
+        return jsonify("Bad Request"),400
+    if 'username' not in request.values:
+        return jsonify("Bad Request"),400
 
-    def performPayment(self,price):
-        return self.amount-price
+    method=request.values['method']
+    price=request.values['price']
+    username=request.values['username']
+    if None not in (method,price,username):
+        result = (jsonify({"order_id" : order_id},{"method" : method},{"price" : price},{"username" : username}))
 
-class MethodForm(FlaskForm):
-    type = StringField(validators=[InputRequired(),Length(
-        min=4, max=20)], render_kw={"placeholder" : "Username"})
+    return result
 
-#método de pagamento
-@app.route('/payment/<int:product_id>', methods=["GET", "POST"] )
-def method(product_id):
-    methodList=db.Query("SELECT * FROM methodsList order by method")
-    return render_template("method.html",templates=methodList )
-    #methods = ['Credit', 'Debit', 'MB']
-    #return render_template('method.html', templates=methods)
-    #form = MethodForm()
-    #if form.validate_on_submit():
-    #    return redirect(url_for('dashboard')) 
-    #return render_template ('method.html', form = form)
-
-@app.route('/payment/<product_id>/<method_id>/<token>', methods=["POST"])
-def transact(product_id,method_id,token):
-    
-    #name = request.json.get('token')
-    name = token
-    price = product_id
-    #price = request.json.get('product_id')
-    amount = 1000
-    wallet = Wallet(name, amount)
-    #user id = token
-    #token = request.json.get('token')
-
-    if price.isdigit() == False :
+#confirm payment
+@app.route('/payment/<int:order_id>/<int:method_id>', methods=["POST"])
+def transact(order_id, method_id):
+    if 'price' not in request.values:
+        return jsonify("Bad Request"),400
+    if 'username' not in request.values:
+        return jsonify("Bad Request"),400
+    if 'nif' not in request.values:
+        return jsonify("Bad Request"),400
+    price=request.values['price']
+    username=request.values['username']
+    nif=request.values['nif']
+    #transaction id is the primary key of the database, and is the concatenation of the order id and the username
+    transaction_id=str(str(order_id)+username)
+    if nif.isdigit() == False :
         return (jsonify({
-            "message" : "invalid amount"
+            "message" : "invalid NIF"
         }))
-    #elif len(name) != 12:
-    #    return (jsonify({
-    #        "message" : "invalid username"
-    #    }))
-    elif not token:
-        return (jsonify({"message": "invalid user"}))
+    elif len(nif) != 9:
+        return (jsonify({
+            "message" : "invalid NIF"
+        }))
     else:
-        new_transaction = transaction(user_id=token, successful="no", amount=price)
+        new_transaction = transaction(transaction_id=transaction_id,order_id=order_id,method_id=method_id, user_id=username, successful="no", amount=price)
         db.session.add(new_transaction)
         db.session.commit()
+        return (jsonify({ "message" : "confirm payment"}))
 
-        return "complete transaction"#url for "complete_trasaction"
-
-#complete transaction
+#complete transaction and update payment state
 @app.route('/payment/<string:token>', methods=["POST"])
 def complete_trasaction(token):
-    #otp =  request.json.get('otp')
-    #if user proceeds to pay
-    otp=TRUE
-    if otp:
-        successful = transaction.query.filter_by(user_id=token).update(dict(successful= "yes"))
+    if 'order_id' not in request.values:
+        return jsonify("Bad Request"),400
+    if 'username' not in request.values:
+        return jsonify("Bad Request"),400
+    order_id=request.values['order_id']
+    username=request.values['username']
+    transaction_id=str(str(order_id)+username)
+    if token is not None:
+        successful = transaction.query.filter_by(transaction_id=transaction_id).update(dict(successful= "yes"))
         db.session.commit()
         return  (jsonify({"message": "transaction successful"}))
     else:
         return (jsonify({"message": "transaction not successful"}))
 
-#atualizar estado do pagamento
-#@app.route('/payment/<int:product_id>/<string:token>/state', methods=['PUT'])
-#def put(product_id):
-#    return 0
-
-#retornar informação
-@app.route('/payment/<int:product_id>/<string:token>', methods=['GET'])
-def get(product_id,token):
-    return {"product" :product_id}
-
 if __name__ == "__main__":
     app.run(debug=True)
-
