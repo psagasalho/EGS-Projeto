@@ -16,7 +16,7 @@ public class FileManagerApplication implements CommandLineRunner {
 	}
 	@Override
 	public void run(String... arg) throws Exception {
-		storageService.deleteAll();
+		// storageService.deleteAll();
 		storageService.init();
 	}
 }
