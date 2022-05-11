@@ -15,7 +15,9 @@ public class FileStorageService {
     private final Path root = Paths.get("src/main/resources/uploads");
    public void init() {
         try {
-            Files.createDirectory(root);
+            if(!Files.exists(root)){
+                Files.createDirectory(root);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize folder for upload!");
         }

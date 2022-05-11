@@ -1,4 +1,5 @@
 package com.egs.fileManager.uploadDownload.controller;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,12 @@ public class FileController {
             return new FileInfo(filename, url);
         }).collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
+    }
+    @GetMapping("/file/{filename:.+}")
+    public ResponseEntity<FileInfo> getFileName(@PathVariable String filename) throws IOException {
+        FileInfo fileInfo = new FileInfo(storageService.load(filename).getFilename(), storageService.load(filename).getURL().toString());
+
+        return ResponseEntity.status(HttpStatus.OK).body(fileInfo);
     }
     @GetMapping("/download/{filename:.+}")
     @ResponseBody
