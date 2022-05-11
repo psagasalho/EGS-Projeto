@@ -1,18 +1,14 @@
 from email import message
 from pickle import FALSE, TRUE
-import random
+import os
 from re import sub
 from flask import Flask, render_template,url_for, redirect, jsonify, request
-import requests
-from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@10.9.0.4:3306/db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@db_payments:3306/db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 db = SQLAlchemy(app)
 
 #database table - transactions
@@ -88,4 +84,4 @@ def complete_trasaction(token):
         return (jsonify({"message": "transaction not successful"}))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

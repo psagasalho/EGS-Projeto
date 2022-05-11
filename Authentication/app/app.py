@@ -8,18 +8,21 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_uuid import FlaskUUID
 import uuid
+import os
 
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 FlaskUUID(app) # use uuid to create a token
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@10.8.0.4:3306/db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@db_auth:3306/db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db= SQLAlchemy(app) # creates the database
 bcrypt = Bcrypt (app) # used in passwords
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db' # connects the app to the database
-app.config['SECRET_KEY'] = 'thisisasercretkey'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+#app.config['SECRET_KEY'] = open('/tmp/secrets/secret_key', 'r').read()
+
 
 
 #database table

@@ -9,31 +9,20 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - db_payment_data:/var/lib/mysql
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
-    ports:
-    - 3306:3306
-    networks:
-        mynetwork4:
-          ipv4_address: 10.9.0.4
 
   api_payments:
       container_name: payments_api      
       build:
         context: .
         dockerfile: dockerfile
-      volumes:
-      - '.:/usr/src/app'  
+      environment:
+            SECRET_KEY : 'thisissecret'  
       ports:
         - 7002:5000
-      networks:
-        mynetwork4:
-          ipv4_address: 10.9.0.2
 
-
-networks:
-  mynetwork4:
-    driver: bridge
-    ipam:
-     config:
-       - subnet: 10.9.0.0/16
+volumes:
+  db_payment_data:

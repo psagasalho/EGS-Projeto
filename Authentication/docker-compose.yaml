@@ -9,40 +9,24 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - db_auth_data:/var/lib/mysql
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
-    ports:
-    - 3306:3306
-    networks:
-        mynetwork3:
-          ipv4_address: 10.8.0.4
-  
+
   adminer_auth:
     image: adminer
     restart: always
-    ports:
-      - 4321:8080
-    networks:
-        mynetwork3:
-          ipv4_address: 10.8.0.3 
 
   api_auth:
       container_name: auth_api      
       build:
         context: .
         dockerfile: dockerfile
-      volumes:
-      - '.:/usr/src/app'  
+      environment:
+            SECRET_KEY : 'thisissecret'
       ports:
         - 7001:5000
-      networks:
-        mynetwork3:
-          ipv4_address: 10.8.0.2
 
-
-networks:
-  mynetwork3:
-    driver: bridge
-    ipam:
-     config:
-       - subnet: 10.8.0.0/16
+volumes:
+  db_auth_data:
