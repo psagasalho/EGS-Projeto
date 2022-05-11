@@ -14,6 +14,12 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
 
+  adminer_payment:
+    image: adminer
+    restart: always
+    ports:
+        - 5679:8080
+
   api_payments:
       container_name: payments_api      
       build:
