@@ -13,9 +13,12 @@ from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 FlaskUUID(app) # use uuid to create a token
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@10.8.0.4:3306/db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db= SQLAlchemy(app) # creates the database
 bcrypt = Bcrypt (app) # used in passwords
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db' # connects the app to the database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db' # connects the app to the database
 app.config['SECRET_KEY'] = 'thisisasercretkey'
 
 
@@ -27,27 +30,42 @@ class User(db.Model):
     nMec = db.Column(db.Integer, nullable=False, unique = True)
     email = db.Column(db.String(30), nullable=False, unique = True)
     password = db.Column(db.String(80), nullable=False)
+    is_logged = db.Column(db.Boolean, unique=False, default=False)
     token = db.Column(db.String(80), nullable=False, unique = True) 
 
+@app.route('/createDB')
+def createDatabase():
+  db.create_all()
+  return jsonify({'message':'Success'})
 
 @app.route('/user/login', methods = ['POST'])
 def login():
     if "username" not in request.values:
-        return jsonify("Bad Request"), 400
+        return jsonify(message = "Bad Request"), 400
     if "password" not in request.values:
-        return jsonify("Bad Request"), 400
+        return jsonify(message = "Bad Request"), 400
 
     user = User.query.filter_by(username=request.values['username']).first()
     if user: # if you are registered, check your password and enter
         passCheck = str(str(request.values['password']) + str("ThisIsSecret"))
         if bcrypt.check_password_hash(user.password, passCheck):
             user_token = User.query.filter_by(token=user.token).first() 
-            return jsonify(description = "OK", token = user_token.token), 200
-    return jsonify("Bad Request"), 400
+            user.is_logged = True
+            db.session.commit()
+            return jsonify(token = user_token.token, message = "Success"), 200
+    return jsonify(message= "Bad Request"), 400
                  
-@app.route('/user/logout', methods=['GET']) 
-def logout():
-    return jsonify("OK"), 200 
+@app.route('/user/logout/<token>', methods=['POST']) 
+def logout(token):
+    user = User.query.filter_by(token=token).first() 
+    user.is_logged = False
+    db.session.commit()
+    return jsonify({'message':'Success'})
+
+@app.route('/user/status/<token>', methods=['POST']) 
+def status(token):
+    user = User.query.filter_by(token=token).first() 
+    return jsonify({'message':'Success','is_logged':str(user.is_logged)})
 
 def checkUser(username, nMec, email):
     existing_user_username = User.query.filter_by(username=username).first()
@@ -64,15 +82,15 @@ def checkUser(username, nMec, email):
 @app.route('/user' ,methods = ['POST'])
 def register():
     if "username" not in request.values:
-        return jsonify("Bad Request"), 400
+        return jsonify(message = "Bad Request"), 400
     if "nMec" not in request.values:
-        return jsonify("Bad Request"), 400
+        return jsonify(message = "Bad Request"), 400
     if "email" not in request.values:
-        return jsonify("Bad Request"), 400
+        return jsonify(message = "Bad Request"), 400
     if "password" not in request.values:
-        return jsonify("Bad Request"), 400
+        return jsonify(message = "Bad Request"), 400
     if "confirmPassword" not in request.values:
-        return jsonify("Bad Request"), 400
+        return jsonify(message = "Bad Request"), 400
 
     varCheck = checkUser(request.values['username'], request.values['nMec'], request.values['email'])
     # it only registers if it is valid
@@ -90,8 +108,8 @@ def register():
                         password=hashed_password, token=random_uuid)
         db.session.add(new_user)
         db.session.commit()
-        return jsonify("OK"), 200
-    return jsonify("Bad Request"), 400
+        return jsonify({'message':'Success'})
+    return jsonify(message = "Bad Request"), 400
    
 #see if the token is valid or not returning the username
 @app.route('/user/<token>',methods = ['GET'])
@@ -122,4 +140,4 @@ def nMec(token):
     return jsonify(token = "invalido"), 500
 """
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

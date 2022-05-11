@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h2 style="margin-top: 50pt; margin-left: 200pt;">All videos:</h2>
+    </div>
+
+    <div class="container">
+      <div class="row my-4">
+
+        {% for video in all_videos %}
+        <div class="col-3">
+
+          <a href="{% url 'main:watch_video' video.id %}" style="text-decoration: none;">
+            <img src="{% static video.thumbnail.url %}" class="w-100">
+          </a>
+          <a href="{% url 'main:watch_video' video.id %}" style="text-decoration: none;">
+            <h6>{{video.title}}</h6>  
+          </a>
+          <span class="text-muted">{{video.video_views.all.count}} views • {{video.pub_date}}</span>
+
+        </div>
+        {% endfor %}
+
+
+      <hr>
+
+    </div>
+
+
+{% endblock %}  
