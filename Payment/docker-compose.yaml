@@ -29,6 +29,14 @@ services:
             SECRET_KEY : 'thisissecret'  
       ports:
         - 7002:5000
+      networks:
+        - internal
 
 volumes:
   db_payment_data:
+
+
+networks:
+  internal:
+    external:
+      name: "internal"

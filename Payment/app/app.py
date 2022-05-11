@@ -1,6 +1,7 @@
 from email import message
 from pickle import FALSE, TRUE
 import os
+import requests
 from re import sub
 from flask import Flask, render_template,url_for, redirect, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -58,7 +59,10 @@ def complete_trasaction(token):
     order_id=request.values['order_id']
     username=request.values['username']
     transaction_id=str(str(order_id)+username)
-    if token is not None:
+    headers = { "accept":"*/*"}
+    r = requests.get('http://auth_api:5000/user/'+token,headers=headers)
+    print(r.json())
+    if r.json()['token'] == 'valid':
         successful = Transaction.query.filter_by(transaction_id=transaction_id).update(dict(successful= "yes"))
         db.session.commit()
         return  (jsonify({"message": "Transaction Successful"}))

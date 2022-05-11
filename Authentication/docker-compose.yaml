@@ -17,6 +17,8 @@ services:
   adminer_auth:
     image: adminer
     restart: always
+    ports:
+        - 5680:8080
 
   api_auth:
       container_name: auth_api      
@@ -27,6 +29,13 @@ services:
             SECRET_KEY : 'thisissecret'
       ports:
         - 7001:5000
+      networks:
+        - internal
 
 volumes:
   db_auth_data:
+
+networks:
+  internal:
+    external:
+      name: "internal"

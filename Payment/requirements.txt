@@ -13,3 +13,4 @@ Werkzeug==1.0.1
 requests
 flask_wtf
 mysql-connector-python
+requests
