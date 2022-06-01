@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: Authentication/docker-compose.yaml
+  checksum: 43c921983eacd5f23d3d57214e4dbd5d50324b7252bf1374ed42e0a5717163c6
+version: "1.0"

@@ -31,6 +31,8 @@ services:
         - 7001:5000
       networks:
         - internal
+      volumes:
+        - /home/raquel/Desktop/EGS/Pratica/Projeto/Secrets_EGS/Authentication/authentication_db_secret.txt:/var/run/Authentication/authentication_db_secret.txt:ro
 
 volumes:
   db_auth_data:

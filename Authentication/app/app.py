@@ -9,12 +9,22 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_uuid import FlaskUUID
 import uuid
 import os
+import sys
 
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 FlaskUUID(app) # use uuid to create a token
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@db_auth:3306/db'
+
+try:
+    f = open('/var/run/Authentication/authentication_db_secret.txt',"r")
+    app.config['SQLALCHEMY_DATABASE_URI'] = f.read().strip()
+    print("DB Secret loaded")
+except:
+    logging.exception("Unable to load db secret")
+    sys.exit(0)
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db= SQLAlchemy(app) # creates the database
