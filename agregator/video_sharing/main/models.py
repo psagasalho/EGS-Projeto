@@ -15,9 +15,6 @@ class VideoPost(models.Model):
     def __str__(self):
         return self.title
 
-
-
-
 class UserData(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     about = models.TextField()

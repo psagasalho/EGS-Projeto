@@ -1,17 +1,19 @@
+import datetime
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from .models import VideoPost, Comment, UserData
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib import messages
-from main.auth import login
+from main.auth import login, register, is_logged
 from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 def home(request):
     if not request.user.is_authenticated:
-        demo_videos = VideoPost.objects.all().order_by('-id')[:5]
+        #demo_videos = VideoPost.objects.all().order_by('-id')[:5]
+        demo_videos = []
         params = {'videos': demo_videos}
         return render(request, 'welcome.html', params)
     else:
@@ -226,15 +228,17 @@ def delete_video(request):
 
 def signup(request):
     if request.method == 'POST':
-        first_name = request.POST['fname']
-        last_name = request.POST['lname']
+        username = request.POST['fname']
+        nMec = int(request.POST['nMec'])
         mail = request.POST['mail']
         pwd = request.POST['pwd']
-        new_user = User.objects.create_user(f'{first_name.lower()}123', mail, pwd)
-        new_user.first_name = first_name
-        new_user.last_name = last_name
-        new_user.save()
-        messages.success(request, 'Account has been created successfully.')
+        confirmpwd = request.POST['confirmpwd']
+
+        register_response = register(username,nMec,mail,pwd,confirmpwd)
+        response = register_response["message"]
+
+        if response == "Success":
+            messages.success(request, 'Account has been created successfully.')
     return redirect('main:home')
 
 
@@ -243,27 +247,14 @@ def user_login(request):
     response = login_response["message"]
 
     if response == "Success":
-
-    #if not request.user.is_authenticated:
-    #    if request.method == 'POST':
-    #        uname = request.POST['uname']
-    #        pwd = request.POST['pwd']
-    #        check_user = authenticate(username = uname, password = pwd)
-    #        if check_user is not None:
-    #            login(request, check_user)
-    #            return redirect('main:home')
-    #        else:
-    #            messages.warning(request, 'Invalid Username or Password.')
-    #            return redirect('main:home')
-    #    return redirect('main:home')
-    #else:
-    #    return redirect('main:home')
-        return redirect('main:home')
+        token = login_response["token"]
+        response = redirect('main:home')
+        response.set_cookie('auth_token', token)
+        response.cookies['auth_token']['expires'] = datetime.today() + datetime.timedelta(days=1)
+        return response
     else:
         messages.warning(request, 'Invalid Username or Password.')
         return redirect('main:home')
-
-
 
 
 def user_logout(request):

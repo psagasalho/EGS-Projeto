@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'video_sharing.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'db_video_sharing',
+        'USER': 'videoadmin',
+        'PASSWORD': 'videoadmin',
+        'HOST': 'db_video_sharing',
+        'PORT': '5432',
     }
 }
 

@@ -13,6 +13,8 @@ services:
       - db_payment_data:/var/lib/mysql
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
+    networks:
+        - internal
 
   adminer_payment:
     image: adminer
