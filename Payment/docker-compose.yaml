@@ -5,6 +5,8 @@ services:
 
   db_payments:
     image: mysql
+    ports:
+      - "3306:3306"
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
@@ -33,11 +35,12 @@ services:
         - 7002:5000
       networks:
         - internal
+      volumes:
+        - ../Secrets_EGS/Payment/payment_bd_secret:/var/run/Payment/secret:ro
 
 volumes:
-  db_payment_data:
-
-
+  db_payment_data: 
+    
 networks:
   internal:
     external:

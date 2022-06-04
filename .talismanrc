@@ -1,0 +1,8 @@
+fileignoreconfig:
+- filename: Authentication/docker-compose.yaml
+  checksum: 43c921983eacd5f23d3d57214e4dbd5d50324b7252bf1374ed42e0a5717163c6
+- filename: Payment/app/app.py
+  checksum: b2a3dcd9cabb7e18adb3152762481ffbcf93e018d5aca4e0f760d752f48c21fe
+- filename: Payment/docker-compose.yaml
+  checksum: e97502e27e8225eae1cefd0bd0b4898632ba76e96b9d0cc7b41e8b7fe6903ecf
+version: "1.0"

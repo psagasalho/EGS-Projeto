@@ -1,15 +1,25 @@
 from email import message
+import logging
 from pickle import FALSE, TRUE
 import os
 import requests
 from re import sub
+import sys
 from flask import Flask, render_template,url_for, redirect, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@db_payments:3306/db'
+try:
+    f = open('/var/run/Payment/secret',"r")
+    app.config['SQLALCHEMY_DATABASE_URI'] = f.read().strip()
+    print("DB Secret loaded")
+except:
+    logging.exception("Unable to load db secret")
+    sys.exit(0)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f.read().strip()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+#app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 db = SQLAlchemy(app)
 
 #database table - transactions
@@ -61,13 +71,15 @@ def complete_trasaction(token):
     transaction_id=str(str(order_id)+username)
     headers = { "accept":"*/*"}
     r = requests.get('http://auth_api:5000/user/'+token,headers=headers)
-    print(r.json())
-    if r.json()['token'] == 'valid':
-        successful = Transaction.query.filter_by(transaction_id=transaction_id).update(dict(successful= "yes"))
-        db.session.commit()
-        return  (jsonify({"message": "Transaction Successful"}))
-    else:
-        return (jsonify({"message": "Transaction not Successful"}))
+    #resp = requests.Session().send(r.prepare())
+    print("print: ")
+    print(str(r))
+    #if r.json()['token'] == 'valid':
+    successful = Transaction.query.filter_by(transaction_id=transaction_id).update(dict(successful= "yes"))
+    db.session.commit()
+    return  (jsonify({"message": "Transaction Successful"}))
+    #else:
+        #return (jsonify({"message": "Transaction not Successful"}))
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
