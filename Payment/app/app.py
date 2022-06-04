@@ -10,15 +10,16 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 try:
-    f = open('/var/run/Payment/secret',"r")
-    app.config['SQLALCHEMY_DATABASE_URI'] = f.read().strip()
+    f = open('/var/run/Payment/secret.txt',"r")
+    secret = f.read().strip()
+    app.config['SQLALCHEMY_DATABASE_URI'] = str(secret)
     print("DB Secret loaded")
 except:
     logging.exception("Unable to load db secret")
     sys.exit(0)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f.read().strip()
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = str(f.read().strip())
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 #app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 db = SQLAlchemy(app)
 
@@ -46,18 +47,18 @@ def method(order_id):
 @app.route('/payment/<int:order_id>/<int:method_id>', methods=["POST"])
 def transact(order_id, method_id):
     if 'price' not in request.values:
-        return jsonify("Bad Request"),400
+        return jsonify('Bad Request'),400
     if 'username' not in request.values:
-        return jsonify("Bad Request"),400
+        return jsonify('Bad Request'),400
     price=request.values['price']
     username=request.values['username']
     #transaction id is the primary key of the database, and is the concatenation of the order id and the username
     transaction_id=str(str(order_id)+username)
     
-    new_transaction = Transaction(transaction_id=transaction_id,order_id=order_id,method_id=method_id, user_id=username, successful="no", amount=price)
+    new_transaction = Transaction(transaction_id=transaction_id,order_id=order_id,method_id=method_id, user_id=username, successful=str("no"), amount=price)
     db.session.add(new_transaction)
     db.session.commit()
-    return jsonify({ "message" : "Confirm Payment"})
+    return jsonify({ 'message' : 'Confirm Payment'})
 
 #complete transaction and update payment state
 @app.route('/payment/<string:token>', methods=["POST"])

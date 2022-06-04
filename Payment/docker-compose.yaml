@@ -36,7 +36,7 @@ services:
       networks:
         - internal
       volumes:
-        - ../Secrets_EGS/Payment/payment_bd_secret:/var/run/Payment/secret:ro
+        - /home/lucia/Documents/EGS/Secrets_EGS/Payment/secret.txt:/var/run/Payment/secret.txt:ro
 
 volumes:
   db_payment_data: 
