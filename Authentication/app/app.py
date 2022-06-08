@@ -16,22 +16,21 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 FlaskUUID(app) # use uuid to create a token
 
-try:
-    f = open('/var/run/Authentication/authentication_db_secret.txt',"r")
-    app.config['SQLALCHEMY_DATABASE_URI'] = f.read().strip()
-    print("DB Secret loaded")
-except:
-    logging.exception("Unable to load db secret")
-    sys.exit(0)
+#try:
+    #f = open('/var/run/Authentication/authentication_db_secret.txt',"r")
+    #app.config['SQLALCHEMY_DATABASE_URI'] = f.read().strip()
+    #print("DB Secret loaded")
+#except:
+    #logging.exception("Unable to load db secret")
+    #sys.exit(0)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@db_auth:3306/db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db= SQLAlchemy(app) # creates the database
 bcrypt = Bcrypt (app) # used in passwords
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db' # connects the app to the database
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-#app.config['SECRET_KEY'] = open('/tmp/secrets/secret_key', 'r').read()
 
 
 
