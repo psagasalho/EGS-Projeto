@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: flaskapi
-          image: registry.deti:5000/auth-api:v1
+          image: registry.deti:5000/gasalho/api-auth:2022060802
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6000
@@ -39,9 +39,8 @@ metadata:
   namespace: gasalho
 spec:
   ports:
-  - port: 5000
+  - port: 6000
     protocol: TCP
     targetPort: 5000
   selector:
     app: flaskapi
-  type: LoadBalancer

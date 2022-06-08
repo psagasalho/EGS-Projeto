@@ -24,7 +24,7 @@ FlaskUUID(app) # use uuid to create a token
     #logging.exception("Unable to load db secret")
     #sys.exit(0)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@db_auth:3306/db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@mysql:3306/db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
