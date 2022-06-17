@@ -6,13 +6,14 @@
 
 <div class="container">
         <div class="row">
+            <form action="{% url 'main:payment_transaction' %}" method="post"></form>
             <div class="col-lg-4 mb-lg-0 mb-3">
                 <div class="card p-3">
                     <div class="number">
                         <label class="fw-bold" for="">Basic</label>
                     </div>
                     <div class="d-flex align-items-center justify-content-between">
-                        <big><span>7.99€</span></big>
+                        <small><span>7.99€</span></small>
                         <small><span>Access to videos.</span></small>
                     </div>
                 </div>
@@ -23,7 +24,7 @@
                         <label class="fw-bold">Standard</label>
                     </div>
                     <div class="d-flex align-items-center justify-content-between">
-                        <big><span>10.99€</span></big>
+                        <small><span>10.99€</span></small>
                         <small><span>Access to videos.</span></small>
                     </div>
                 </div>
@@ -34,7 +35,7 @@
                         <label class="fw-bold">Premium</label>
                     </div>
                     <div class="d-flex align-items-center justify-content-between">
-                        <big><span>12.99€</span></big>
+                        <small><span>12.99€</span></small>
                         <small><span>Access to videos.</span></small>
                     </div>
                 </div>
