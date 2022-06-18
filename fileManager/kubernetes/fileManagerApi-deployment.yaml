@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: fileManagerApi
-          image: registry.deti:5000/(MUDAR)
+          image: registry.deti:5000/gasalho/api-filemanager:2022061501
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6000
