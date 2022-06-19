@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fileManagerApi-deployment
+  namespace: gasalho
+  labels:
+    app: fileManagerApi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fileManagerApi
+  template:
+    metadata:
+      labels:
+        app: fileManagerApi
+    spec:
+      containers:
+        - name: fileManagerApi
+          image: registry.deti:5000/gasalho/api-filemanager:2022061501
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6000
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fileManagerApi-secrets
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              value: fileManagerApi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fileManagerApi-service
+  namespace: gasalho
+spec:
+  ports:
+  - port: 6000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: fileManagerApi
