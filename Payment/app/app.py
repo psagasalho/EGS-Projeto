@@ -9,16 +9,17 @@ from flask import Flask, render_template,url_for, redirect, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-try:
-    f = open('/var/run/Payment/secret.txt',"r")
-    secret = f.read().strip()
-    app.config['SQLALCHEMY_DATABASE_URI'] = str(secret)
-    print("DB Secret loaded")
-except:
-    logging.exception("Unable to load db secret")
-    sys.exit(0)
+#try:
+#    f = open('/var/run/Payment/secret.txt',"r")
+#    secret = f.read().strip()
+#    app.config['SQLALCHEMY_DATABASE_URI'] = str(secret)
+#    print("DB Secret loaded")
+#except:
+#    logging.exception("Unable to load db secret")
+#    sys.exit(0)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = str(f.read().strip())
+#app.config['SQLALCHEMY_DATABASE_URI'] = str(f.read().strip())
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:example@payment-db/db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 #app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 db = SQLAlchemy(app)
@@ -71,16 +72,13 @@ def complete_trasaction(token):
     username=request.values['username']
     transaction_id=str(str(order_id)+username)
     headers = { "accept":"*/*"}
-    r = requests.get('http://auth_api:5000/user/'+token,headers=headers)
-    #resp = requests.Session().send(r.prepare())
-    print("print: ")
-    print(str(r))
-    #if r.json()['token'] == 'valid':
-    successful = Transaction.query.filter_by(transaction_id=transaction_id).update(dict(successful= "yes"))
-    db.session.commit()
-    return  (jsonify({"message": "Transaction Successful"}))
-    #else:
-        #return (jsonify({"message": "Transaction not Successful"}))
+    r = requests.get('http://authapi-service:6000/user/'+token,headers=headers)
+    if r.json()['token'] == 'valid':
+        successful = Transaction.query.filter_by(transaction_id=transaction_id).update(dict(successful= "yes"))
+        db.session.commit()
+        return  (jsonify({"message": "Transaction Successful"}))
+    else:
+        return (jsonify({"message": "Transaction not Successful"}))
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

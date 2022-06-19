@@ -2,23 +2,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flaskapi-deployment
+  name: authapi-deployment
   namespace: gasalho
   labels:
-    app: flaskapi
+    app: authapi
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: flaskapi
+      app: authapi
   template:
     metadata:
       labels:
-        app: flaskapi
+        app: authapi
     spec:
       containers:
-        - name: flaskapi
-          image: registry.deti:5000/gasalho/api-auth:2022060802
+        - name: authapi
+          image: registry.deti:5000/gasalho/api-auth:2022061508
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6000
@@ -35,7 +35,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: flask-service
+  name: authapi-service
   namespace: gasalho
 spec:
   ports:
@@ -43,4 +43,4 @@ spec:
     protocol: TCP
     targetPort: 5000
   selector:
-    app: flaskapi
+    app: authapi

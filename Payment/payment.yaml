@@ -1,9 +1,10 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: payment
-  namespace: lucia
+  namespace: gasalho
+  labels:
+    app: payment
 spec:
   replicas: 1
   selector:
@@ -16,28 +17,29 @@ spec:
     spec:
       containers:
         - name: payment
-          image: registry.deti:5000/lucia/api-payment:v1
+          image: registry.deti:5000/gasalho/api-payments:2022061910
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 6001
           env:
-            - name: DB_HOST
-              value: mysql
-            - name: DB_NAME
-              value: fileManager
-            - name: DB_USERNAME
-              value: root
-            - name: DB_PASSWORD
-              value: root
+            - name: db_root_password
+              valueFrom:
+                secretKeyRef:
+                  name: flaskapi-secrets
+                  key: db_root_password
+            - name: db_name
+              value: flaskapi
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: payment-service
-  namespace: lucia
+  namespace: gasalho
 spec:
+  ports:
+  - port: 6001
+    protocol: TCP
+    targetPort: 5000
   selector:
     app: payment
-  ports:
-    - port: 80
-      targetPort: 8080
-  type: LoadBalancer

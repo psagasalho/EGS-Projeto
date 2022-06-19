@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: auth-db
   namespace: gasalho
   labels:
     app: db
@@ -17,7 +17,7 @@ spec:
         app: db
     spec:
       containers:
-      - name: mysql
+      - name: auth-db
         image: mysql
         imagePullPolicy: IfNotPresent
         env:
@@ -42,7 +42,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: auth-db
   namespace: gasalho
   labels:
     app: db
@@ -50,6 +50,6 @@ spec:
   ports:
   - port: 3306
     protocol: TCP
-    name: mysql
+    name: auth-db
   selector:
     app: db
