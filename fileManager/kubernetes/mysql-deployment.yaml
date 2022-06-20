@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: filemanager-db
   namespace: gasalho
   labels:
     app: testdb
@@ -17,7 +17,7 @@ spec:
         app: testdb
     spec:
       containers:
-      - name: mysql
+      - name: filemanager-db
         image: mysql
         imagePullPolicy: IfNotPresent
         env:
@@ -40,7 +40,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: filemanager-db
   namespace: gasalho
   labels:
     app: testdb
@@ -48,6 +48,6 @@ spec:
   ports:
   - port: 3306
     protocol: TCP
-    name: mysql
+    name: filemanager-db
   selector:
     app: testdb
