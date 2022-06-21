@@ -24,11 +24,11 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fileManagerApi-secrets
+              name: fileapi-secrets
               key: DB_PASSWORD
         ports:
         - containerPort: 3306
-          name: testdb-container
+          name: testdb-contain
         volumeMounts:
           - name: mysql-persistent-storage
             mountPath: /var/lib/mysql
