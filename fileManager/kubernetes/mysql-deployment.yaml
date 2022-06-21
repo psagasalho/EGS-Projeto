@@ -40,7 +40,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: filemanager-db
+  name: filemanager-db-service
   namespace: gasalho
   labels:
     app: testdb
@@ -48,6 +48,6 @@ spec:
   ports:
   - port: 3306
     protocol: TCP
-    name: filemanager-db
+    name: filemanager-db-service
   selector:
     app: testdb
