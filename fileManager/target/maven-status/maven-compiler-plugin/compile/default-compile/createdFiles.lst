@@ -1,0 +1,8 @@
+com\egs\fileManager\FileManagerApplication.class
+com\egs\fileManager\message\ResponseFile.class
+com\egs\fileManager\service\FileStorageService.class
+com\egs\fileManager\controller\FileController.class
+com\egs\fileManager\repository\FileDBRepository.class
+com\egs\fileManager\exception\FileUploadExceptionAdvice.class
+com\egs\fileManager\model\FileDB.class
+com\egs\fileManager\message\ResponseMessage.class
