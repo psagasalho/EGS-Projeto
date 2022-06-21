@@ -24,7 +24,7 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fileapi-secrets
+              name: filemanagerapi-secrets
               key: DB_PASSWORD
         ports:
         - containerPort: 3306
@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
-            claimName: mysql-pv-claim
+            claimName: mysql-pv2-claim
 ---
 apiVersion: v1
 kind: Service

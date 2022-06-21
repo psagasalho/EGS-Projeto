@@ -74,14 +74,26 @@ WSGI_APPLICATION = 'video_sharing.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'NAME': 'db_video_sharing',
+#        'USER': 'videoadmin',
+#        'PASSWORD': 'videoadmin',
+#        'HOST': 'db_video_sharing',
+#        'PORT': '5432',
+#    }
+#}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'db_video_sharing',
-        'USER': 'videoadmin',
-        'PASSWORD': 'videoadmin',
-        'HOST': 'db_video_sharing',
-        'PORT': '5432',
+        'NAME': 'kubernetes_django',
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT', 5432)
+
     }
 }
 

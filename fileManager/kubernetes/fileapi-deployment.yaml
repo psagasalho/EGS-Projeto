@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: filemanagerapi
-          image: registry.deti:5000/gasalho/api-filemanager:2022061501
+          image: registry.deti:5000/gasalho/api-filemanager:2022062102
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6000

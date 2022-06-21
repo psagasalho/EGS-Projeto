@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agregator
+  namespace: gasalho
+  labels:
+    app: agregator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agregator
+  template:
+    metadata:
+      labels:
+        app: agregator
+    spec:
+      containers:
+        - name: agregator
+          image: registry.deti:5000/gasalho/agregator:2022062005
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: user
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+
+            - name: POSTGRES_HOST
+              value: postgres-service
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: django-service
+  namespace: gasalho
+spec:
+  selector:
+    app: agregator
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000

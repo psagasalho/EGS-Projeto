@@ -1,5 +1,5 @@
 Django
 requests
 gunicorn
-psycopg2
 Pillow
+psycopg2-binary
