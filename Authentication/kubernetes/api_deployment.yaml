@@ -1,26 +1,27 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment
-  namespace: gasalho
+  name: authapi-deployment
+  namespace: egs10
   labels:
-    app: payment
+    app: authapi
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: payment
+      app: authapi
   template:
     metadata:
       labels:
-        app: payment
+        app: authapi
     spec:
       containers:
-        - name: payment
-          image: registry.deti:5000/gasalho/api-payments:2022061910
+        - name: authapi
+          image: registry.deti:5000/egs10/api-auth:2022062401
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 6001
+            - containerPort: 6000
           env:
             - name: db_root_password
               valueFrom:
@@ -34,12 +35,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: payment-service
-  namespace: gasalho
+  name: authapi-service
+  namespace: egs10
 spec:
   ports:
-  - port: 6001
+  - port: 6000
     protocol: TCP
     targetPort: 5000
   selector:
-    app: payment
+    app: authapi

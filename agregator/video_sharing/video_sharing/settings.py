@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ikx1#nxj@@9lhov72971i#))_0q@0g-oyi3jp$2#%n4&!ua03$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["agregator.k3s"]
 
 
 # Application definition

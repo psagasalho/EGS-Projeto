@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: filemanagerapi-deployment
-  namespace: gasalho
+  namespace: egs10
   labels:
     app: filemanagerapi
 spec:
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: filemanagerapi
-          image: registry.deti:5000/gasalho/api-filemanager:2022062103
+          image: registry.deti:5000/egs10/api-filemanager:2022062401
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6000
@@ -35,7 +35,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: filemanagerapi-service
-  namespace: gasalho
+  namespace: egs10
 spec:
   ports:
   - port: 6000

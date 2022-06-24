@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: gasalho
+  namespace: egs10
   labels:
     app: postgres-container
 spec:
@@ -45,7 +45,7 @@ spec:
       volumes:
         - name: postgres-volume-mount
           persistentVolumeClaim:
-            claimName: postgres-pv-claim
+            claimName: postgres-pv2-claim
 
 ---
 
@@ -53,7 +53,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: gasalho
+  namespace: egs10
 spec:
   ports:
     - protocol: TCP

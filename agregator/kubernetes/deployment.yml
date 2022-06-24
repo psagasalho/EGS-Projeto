@@ -1,8 +1,33 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: django-ingress
+  namespace: egs10
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+spec:
+  rules:
+  - host: agregator.k3s
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: django-service
+            port: 
+              number: 8000
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: agregator
-  namespace: gasalho
+  namespace: egs10
   labels:
     app: agregator
 spec:
@@ -17,7 +42,7 @@ spec:
     spec:
       containers:
         - name: agregator
-          image: registry.deti:5000/gasalho/agregator:2022062005
+          image: registry.deti:5000/egs10/agregator:2022062402
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -42,7 +67,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: django-service
-  namespace: gasalho
+  namespace: egs10
 spec:
   selector:
     app: agregator

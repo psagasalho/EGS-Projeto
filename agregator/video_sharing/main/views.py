@@ -1,10 +1,11 @@
 import datetime
+from datetime import date
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from .models import VideoPost, Comment, UserData
-from django.contrib.auth import login, logout
+from django.contrib.auth import authenticate,login, logout
 from django.contrib import messages
 from main.auth import login, register, is_logged
 from django.core.exceptions import ObjectDoesNotExist
@@ -237,6 +238,11 @@ def signup(request):
         register_response = register(username,nMec,mail,pwd,confirmpwd)
         response = register_response["message"]
 
+        new_user = User.objects.create_user(f'{username.lower()}123', mail, pwd)
+        new_user.username = username
+        new_user.nMec = nMec
+        new_user.save()
+
         if response == "Success":
             messages.success(request, 'Account has been created successfully.')
     return redirect('main:home')
@@ -249,8 +255,13 @@ def user_login(request):
     if response == "Success":
         token = login_response["token"]
         response = redirect('main:home')
+
+        check_user = authenticate(username = request.POST['uname'], password = request.POST['pwd'])
+        if check_user is not None:
+            login(request, check_user)
+            
         response.set_cookie('auth_token', token)
-        response.cookies['auth_token']['expires'] = datetime.today() + datetime.timedelta(days=1)
+        response.cookies['auth_token']['expires'] = date.today() + datetime.timedelta(days=1)
         return response
     else:
         messages.warning(request, 'Invalid Username or Password.')

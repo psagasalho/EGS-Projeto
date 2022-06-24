@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: filemanager-db
-  namespace: gasalho
+  namespace: egs10
   labels:
     app: testdb
 spec:
@@ -35,13 +35,13 @@ spec:
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
-            claimName: mysql-pv2-claim
+            claimName: mysql-pv3-claim
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: filemanager-db-service
-  namespace: gasalho
+  namespace: egs10
   labels:
     app: testdb
 spec:

@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-pv2-volume
-  namespace: gasalho
+  name: mysql-pv3-volume
+  namespace: egs10
   labels:
     type: local
 spec:
@@ -18,8 +18,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pv2-claim
-  namespace: gasalho
+  name: mysql-pv3-volume
+  namespace: egs10
 spec:
   storageClassName: manual
   accessModes:
